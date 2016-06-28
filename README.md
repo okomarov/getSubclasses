@@ -24,4 +24,4 @@ C:\Program Files\MATLAB\R2016a\toolbox\finance\finsupport\@sde\sde.m  % sde cons
 
 getSubclasses('sde','C:\Program Files\MATLAB\R2016a\toolbox\finance\finsupport\');
 ```
-![sde subclasses](/blob/master/example.png)
+![sde subclasses](example.png)
