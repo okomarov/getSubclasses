@@ -18,10 +18,10 @@ Produces a table with `names`, `from` and `to` nodes, i.e. the current and the n
 If the `getSubclasses()` is called without an output, it will plot a `graph()` with the dependencies (requires version R2015b).
 
 ### Example
+```matlab
+which sde
+C:\Program Files\MATLAB\R2016a\toolbox\finance\finsupport\@sde\sde.m  % sde constructor
 
-    which sde
-    C:\Program Files\MATLAB\R2016a\toolbox\finance\finsupport\@sde\sde.m  % sde constructor
-    
-    getSubclasses('sde','C:\Program Files\MATLAB\R2016a\toolbox\finance\finsupport\');
-
-[sde subclasses](snapshot.png)
+getSubclasses('sde','C:\Program Files\MATLAB\R2016a\toolbox\finance\finsupport\');
+```
+[sde subclasses](/blob/master/example.png)
