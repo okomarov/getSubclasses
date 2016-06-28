@@ -25,3 +25,7 @@ C:\Program Files\MATLAB\R2016a\toolbox\finance\finsupport\@sde\sde.m  % sde cons
 getSubclasses('sde','C:\Program Files\MATLAB\R2016a\toolbox\finance\finsupport\');
 ```
 ![sde subclasses](example.png)
+
+Which we can compare with the ufficial documentation at [SDE class hierarchy](http://uk.mathworks.com/help/finance/sde-class-hierarchy.html), i.e.
+
+![sde hierarchy](http://uk.mathworks.com/help/finance/sde_class_hierarchy_8b.gif)
