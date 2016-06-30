@@ -46,7 +46,7 @@ garray = recurseFolder(rootpath, garray);
 tb     = getFromToNodes(garray{1});
 
 if nargout == 0
-    G = graph(tb.from, tb.to, [], tb.names);
+    G = graph(tb.from, tb.to, [], unique(tb.names,'stable'));
     G.plot()
 end
 end
@@ -74,8 +74,8 @@ files = regexp(files,'.+(?=\.m|\.p)','match','once');
 subfolders = {list(idir).name};
 
 % Drop . and .. (setdiff is slow)
-nfld       = nnz(idir);
-idir       = false(nfld,1);
+nfld = nnz(idir);
+idir = false(nfld,1);
 for ii = 1:nfld
     idir(ii) = subfolders{ii}(1) == '.';
 end
@@ -198,15 +198,34 @@ c         = 0;
 names     = cell(n,1);
 for k = keys
     value = g(k{1});
-    for p = value.Parent
-        c        = c+1;
-        from(c)  = value.Node;
-        to(c)    = getNode(g,p{1});
-        names{c} = k{1};
+    for p = value.Parent(:)'
+        c = c+1;
+        try
+            to(c) = getNode(g,p{1});
+        catch
+            to(c) = value.Node;
+        end
+            from(c)  = value.Node;
+            names{c} = k{1};
     end
 end
 tb = table(names, from, to);
+tb = unique(tb,'rows');
 tb = sortrows(tb,'from');
+
+% remove duplicates
+[un,trash,subs]             = unique(tb.names);
+irepeated                   = accumarray(subs,1) > 1;
+irepeated                   = ismember(tb.names,un(irepeated));
+icircular                   = tb.from == tb.to;
+tb(irepeated & icircular,:) = [];
+
+% TODO: avoid re-mapping node
+[un,trash,from_new] = unique(tb.from);
+[trash,pos]         = ismember(tb.to, tb.from);
+to_new              = from_new(pos);
+tb.from             = from_new;
+tb.to               = to_new;
 end
 
 function rclass = validateRootclass(rclass)
