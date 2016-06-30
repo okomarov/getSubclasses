@@ -102,22 +102,40 @@ end
 
 % recursively travel up through all parents assigning node values
 function [garray, current_node, doMerge] = getSuperclassTree(mcls,garray,index, current_node)
-parent_list = getParentList(mcls);
-nparen = numel(parent_list);
-for ii = 1:nparen
-    new_parent                = parent_list(ii).Name;
-    [trash,names]             = getParentList(parent_list(ii));
-    garray{index}(new_parent) = makeVal(names,current_node+1);
+disp(mcls.Name)
+% Add direct parents
+[garray{index}, parent_list, current_node] = addParents(mcls, garray{index}, current_node);
 
-    [doMerge, into] = isInTreeArray(garray(1:end-1), new_parent);
+% Check if any parent is mergeable
+doMerge  = false;
+nparen   = numel(parent_list);
+iexclude = false(nparen,1);
+for ii = 1:nparen
+    p               = parent_list(ii);
+    [doMerge, into] = isInTreeArray(garray(1:end-1), p.Name);
     if doMerge
-        garray{into} = mergeTrees(garray{into}, garray{index}, new_parent);
-    else
-        [garray, current_node] = getSuperclassTree(parent_list(ii), garray, index, current_node+1);
+        garray{into} = mergeTrees(garray{into}, garray{index}, p.Name);
+        iexclude(ii) = true;
     end
 end
+
+% Exclude merged parents from recursion
+parent_list(iexclude) = [];
+
+% Recurse each parent up
+for p = parent_list(:)'
+    [garray, current_node, doMerge] = getSuperclassTree(p, garray, index, current_node);
+end
 end
 
+function [tree, list, nodenum] = addParents(mcls, tree, nodenum)
+[list, parent_names] = getParentList(mcls);
+for ii = 1:numel(list)
+    nodenum                   = nodenum + 1;
+    [trash,grandparent_names] = getParentList(list(ii));
+    tree(parent_names{ii})    = makeVal(grandparent_names,nodenum);
+end
+end
 % get meta classes and names of parents
 function [list,names] = getParentList(mcls)
 list = mcls.SuperclassList;
@@ -161,12 +179,14 @@ node = val.Node;
 end
 
 % checks if class is already part of any tree
-function [bool,t] = isInTreeArray(array,classname)
+function [bool,into] = isInTreeArray(array,classname)
 numtrees = numel(array);
 bool     = false;
+into     = 0;
 for t = 1:numtrees
     bool = bool | array{t}.isKey(classname);
     if bool
+        into = t;
         return
     end
 end
