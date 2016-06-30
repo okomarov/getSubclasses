@@ -36,11 +36,10 @@ if isempty(rootclass) || ~isa(rootclass, 'meta.class')
     error('getSubclasses:unrecognizedClass','Unrecognized class.')
 end
 
-s = what(rootclass.Name);
 if nargin < 2
-    rootpath = s.path;
+    rootpath = 0;
 end
-rootpath = validateRootpath(rootpath);
+rootpath = validateRootpath(rootpath, rootclass);
 
 garray = addNewTree([],rootclass,{rootclass.Name});
 garray = recurseFolder(rootpath, garray);
@@ -218,8 +217,9 @@ elseif isobject(rclass) && ~isa(rclass, 'meta.class')
 end
 end
 
-function rpath = validateRootpath(rpath)
-if isnumeric(rpath) && rpath < 0 && mod(rpath,1) == 0
+function rpath = validateRootpath(rpath, rclass)
+if isnumeric(rpath) && rpath <= 0 && mod(rpath,1) == 0
+    s = what(rclass.Name);
     for ii = 1:abs(rpath)
         s.path = fileparts(s.path);
     end
